@@ -1,0 +1,23 @@
+{
+  "name": "video-note",
+  "version": "1.0.0",
+  "description": "app to create video ideas",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yolantele/Video-note.git"
+  },
+  "author": "Jolanta Jasiulionyte",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yolantele/Video-note/issues"
+  },
+  "homepage": "https://github.com/Yolantele/Video-note#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "express-handlebars": "^3.0.0"
+  }
+}
