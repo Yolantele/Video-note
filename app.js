@@ -1,7 +1,22 @@
 var express = require('express');
 var exphbs = require('express-handlebars');
+var mongoose = require('mongoose');
 
 var app = express();
+
+// Map global promise - get rif of warning
+mongoose.Promise = global.Promise;
+
+//Connect to mongoose (not working at the moment)
+mongoose.connect('mongodb://jolanta:jolanta@ds231987.mlab.com:31987/jolantajas', {
+  useMongoClient: true
+})
+  .then(function(){
+    console.log('MongoDB Connected...');
+  })
+  .catch(function(err){
+    console.log(err);
+  });
 
 // Handlebars Middleware
 app.engine('handlebars', exphbs({
