@@ -65,6 +65,18 @@ app.get('/ideas/add', function(req, res){
   res.render('ideas/add');
 });
 
+// Edit Idea Form
+app.get('/ideas/edit/:id', function(req, res){
+  Idea.findOne({
+    _id: req.params.id
+  })
+  .then(function(idea){
+    res.render('ideas/edit', {
+      idea: idea
+    });
+  });
+});
+
 // process form
 app.post('/ideas', function(req, res) {
   var errors = [];
