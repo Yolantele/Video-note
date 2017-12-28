@@ -2,6 +2,7 @@ var express = require('express');
 var exphbs = require('express-handlebars');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var methodOverride = require('method-override')
 
 var app = express();
 
@@ -33,8 +34,11 @@ app.set('view engine', 'handlebars');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+//Method override middleware
+app.use(methodOverride('_method'));
 
-//   ROUTES
+
+//--- ROUTES ---
 
 // Index Route
 app.get('/', function(req, res){
@@ -105,6 +109,22 @@ app.post('/ideas', function(req, res) {
       });
   }
 });
+// Edit form process
+app.put('/ideas/:id', function(req, res){
+  Idea.findOne({
+    _id: req.params.id
+  })
+  .then(function(idea){
+    // new values replaced and saved
+    idea.title = req.body.title;
+    idea.details = req.body.details;
+    idea.save()
+      .then(function(idea){
+        res.redirect('/ideas');
+      });
+  });
+});
+
 
 var port = 5000;
 app.listen(port, function(){
