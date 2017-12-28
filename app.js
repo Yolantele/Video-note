@@ -1,15 +1,18 @@
 var express = require('express');
 var exphbs = require('express-handlebars');
-var mongoose = require('mongoose');
+var methodOverride = require('method-override');
+var flash = require('connect-flash');
+var session = require('express-session');
 var bodyParser = require('body-parser');
-var methodOverride = require('method-override')
+var mongoose = require('mongoose');
 
 var app = express();
 
-// Map global promise - get rif of warning
+
+// Map global promise - get rid of warning
 mongoose.Promise = global.Promise;
 
-//Connect to mongoose
+//Connect to external mongoDB through Mlab
 mongoose.connect('mongodb://jolanta:jolanta@ds231987.mlab.com:31987/jolantajas', {
   useMongoClient: true
 })
@@ -24,6 +27,9 @@ mongoose.connect('mongodb://jolanta:jolanta@ds231987.mlab.com:31987/jolantajas',
 require('./models/Idea');
 var Idea = mongoose.model('ideas');
 
+
+//--- MIDDLEWARE : ---
+
 // Handlebars Middleware
 app.engine('handlebars', exphbs({
   defaultLayout: 'main'
@@ -37,8 +43,24 @@ app.use(bodyParser.json());
 //Method override middleware
 app.use(methodOverride('_method'));
 
+//  Express secret middleware
+app.use(session({
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true,
+}));
 
-//--- ROUTES ---
+app.use(flash());
+
+//Globall variables:
+app.use(function(req, res, next){
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  next();
+});
+
+//--- ROUTES : ---
 
 // Index Route
 app.get('/', function(req, res){
@@ -81,7 +103,7 @@ app.get('/ideas/edit/:id', function(req, res){
   });
 });
 
-// process form
+// Process form
 app.post('/ideas', function(req, res) {
   var errors = [];
   if(!req.body.title){
@@ -105,11 +127,12 @@ app.post('/ideas', function(req, res) {
     new Idea(newUser)
       .save()
       .then(function(idea){
+        req.flash('success_msg', 'Video idea added');
         res.redirect('/ideas');
       });
   }
 });
-// Edit form process
+// Process Edit form
 app.put('/ideas/:id', function(req, res){
   Idea.findOne({
     _id: req.params.id
@@ -120,6 +143,7 @@ app.put('/ideas/:id', function(req, res){
     idea.details = req.body.details;
     idea.save()
       .then(function(idea){
+        req.flash('success_msg', 'Video idea updated');
         res.redirect('/ideas');
       });
   });
@@ -129,6 +153,7 @@ app.put('/ideas/:id', function(req, res){
 app.delete('/ideas/:id', function(req, res){
   Idea.remove({ _id: req.params.id })
   .then(function(){
+    req.flash('success_msg', 'Video idea removed');
     res.redirect('/ideas');
   });
 });
