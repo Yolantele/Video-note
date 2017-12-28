@@ -69,8 +69,17 @@ app.post('/ideas', function(req, res) {
       title: req.body.title,
       details: req.body.details
     });
+    
   } else {
-    res.send('passed');
+    var newUser = {
+      title: req.body.title,
+      details: req.body.details
+    };
+    new Idea(newUser)
+      .save()
+      .then(function(idea){
+        res.redirect('/ideas');
+      });
   }
 });
 
