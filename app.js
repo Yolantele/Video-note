@@ -49,6 +49,17 @@ app.get('/about', function(req, res){
   res.render('about');
 });
 
+// Idea index page fetch from DB
+app.get('/ideas', function(req, res){
+  Idea.find({})
+    .sort({date: 'desc'})
+    .then(function(ideas) {
+      res.render('ideas/index',{
+        ideas: ideas
+      });
+    });
+});
+
 // Add Idea Form
 app.get('/ideas/add', function(req, res){
   res.render('ideas/add');
@@ -69,7 +80,7 @@ app.post('/ideas', function(req, res) {
       title: req.body.title,
       details: req.body.details
     });
-    
+
   } else {
     var newUser = {
       title: req.body.title,
