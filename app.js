@@ -125,6 +125,14 @@ app.put('/ideas/:id', function(req, res){
   });
 });
 
+// Delete idea from DB
+app.delete('/ideas/:id', function(req, res){
+  Idea.remove({ _id: req.params.id })
+  .then(function(){
+    res.redirect('/ideas');
+  });
+});
+
 
 var port = 5000;
 app.listen(port, function(){
