@@ -18,7 +18,7 @@ var users = require('./routes/users');
 require('./config/passport')(passport);
 
 // DB Config
-var db = require('./config/dadatabase');
+var db = require('./config/database');
 
 // Map global promise - get rid of warning
 mongoose.Promise = global.Promise;
