@@ -50,12 +50,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Method override middleware
 app.use(methodOverride('_method'));
 
-// Express secret middleware
+// Express session (secret) middleware
 app.use(session({
   secret: 'secret',
   resave: true,
   saveUninitialized: true,
 }));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(flash());
 
@@ -64,6 +68,7 @@ app.use(function(req, res, next){
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
   res.locals.error = req.flash('error');
+  res.locals.user = req.user || null;
   next();
 });
 

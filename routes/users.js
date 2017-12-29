@@ -26,7 +26,7 @@ router.post('/login', function(req, res){
     successRedirect: '/ideas',
     failureRedirect: '/users/login',
     failureFlash: true
-  })(req, res); //next 
+  })(req, res); //next
 });
 
 // Register form post, saved in DB
@@ -78,6 +78,13 @@ router.post('/register', function(req, res){
         }
       });
   }
+});
+
+// Logout User
+router.get('/logout', function(req, res){
+  req.logout();
+  req.flash('success_msg', 'You are logged out');
+  res.redirect('/users/login');
 });
 
 
