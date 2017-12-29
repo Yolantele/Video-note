@@ -8,11 +8,14 @@ var mongoose = require('mongoose');
 
 var app = express();
 
+// Load routes
+var ideas = require('./routes/ideas');
+var users = require('./routes/users');
 
 // Map global promise - get rid of warning
 mongoose.Promise = global.Promise;
 
-//Connect to external mongoDB through Mlab
+// Connect to external mongoDB through Mlab
 mongoose.connect('mongodb://jolanta:jolanta@ds231987.mlab.com:31987/jolantajas', {
   useMongoClient: true
 })
@@ -22,10 +25,6 @@ mongoose.connect('mongodb://jolanta:jolanta@ds231987.mlab.com:31987/jolantajas',
   .catch(function(err){
     console.log(err);
   });
-
-// Load idea model
-require('./models/Idea');
-var Idea = mongoose.model('ideas');
 
 
 //--- MIDDLEWARE : ---
@@ -40,10 +39,10 @@ app.set('view engine', 'handlebars');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//Method override middleware
+// Method override middleware
 app.use(methodOverride('_method'));
 
-//  Express secret middleware
+// Express secret middleware
 app.use(session({
   secret: 'secret',
   resave: true,
@@ -52,7 +51,7 @@ app.use(session({
 
 app.use(flash());
 
-//Globall variables:
+// Globall variables:
 app.use(function(req, res, next){
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
@@ -62,7 +61,7 @@ app.use(function(req, res, next){
 
 //--- ROUTES : ---
 
-// Index Route
+// Index
 app.get('/', function(req, res){
   var title = 'Welcome1';
   res.render('index', {
@@ -70,93 +69,14 @@ app.get('/', function(req, res){
   });
 });
 
-// About Route
+// About
 app.get('/about', function(req, res){
   res.render('about');
 });
 
-// Idea index page fetch from DB
-app.get('/ideas', function(req, res){
-  Idea.find({})
-    .sort({date: 'desc'})
-    .then(function(ideas) {
-      res.render('ideas/index',{
-        ideas: ideas
-      });
-    });
-});
-
-// Add Idea Form
-app.get('/ideas/add', function(req, res){
-  res.render('ideas/add');
-});
-
-// Edit Idea Form
-app.get('/ideas/edit/:id', function(req, res){
-  Idea.findOne({
-    _id: req.params.id
-  })
-  .then(function(idea){
-    res.render('ideas/edit', {
-      idea: idea
-    });
-  });
-});
-
-// Process form
-app.post('/ideas', function(req, res) {
-  var errors = [];
-  if(!req.body.title){
-    errors.push({text: 'Please add a title'});
-  }
-  if(!req.body.details){
-    errors.push({text: 'Please add some details'});
-  }
-  if(errors.length > 0){
-    res.render('ideas/add', {
-      errors: errors,
-      title: req.body.title,
-      details: req.body.details
-    });
-
-  } else {
-    var newUser = {
-      title: req.body.title,
-      details: req.body.details
-    };
-    new Idea(newUser)
-      .save()
-      .then(function(idea){
-        req.flash('success_msg', 'Video idea added');
-        res.redirect('/ideas');
-      });
-  }
-});
-// Process Edit form
-app.put('/ideas/:id', function(req, res){
-  Idea.findOne({
-    _id: req.params.id
-  })
-  .then(function(idea){
-    // new values replaced and saved
-    idea.title = req.body.title;
-    idea.details = req.body.details;
-    idea.save()
-      .then(function(idea){
-        req.flash('success_msg', 'Video idea updated');
-        res.redirect('/ideas');
-      });
-  });
-});
-
-// Delete idea from DB
-app.delete('/ideas/:id', function(req, res){
-  Idea.remove({ _id: req.params.id })
-  .then(function(){
-    req.flash('success_msg', 'Video idea removed');
-    res.redirect('/ideas');
-  });
-});
+// Use routes:
+app.use('/ideas', ideas);
+app.use('/users', users);
 
 
 var port = 5000;
