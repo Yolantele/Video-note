@@ -6,12 +6,12 @@ var router = express.Router();
 
 // User Log:
 router.get('/login', function(req, res){
-  res.send('login');
+  res.render('users/login');
 });
 
 // User register:
 router.get('/register', function(req, res){
-  res.send('register');
+  res.render('users/register');
 });
 
 module.exports = router;
