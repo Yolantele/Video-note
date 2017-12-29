@@ -1,17 +1,18 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var router = express.Router();
+var {ensureAuthenticated} = require('../helpers/auth');
+
 
 // Load idea model
 require('../models/Idea');
 var Idea = mongoose.model('ideas');
 
-
 // --- ROUTES : ---
 
 // Idea index page fetch from DB
-router.get('/', function(req, res){
-  Idea.find({})
+router.get('/', ensureAuthenticated, function(req, res){
+  Idea.find({user:req.user.id})
     .sort({date: 'desc'})
     .then(function(ideas) {
       res.render('ideas/index',{
@@ -21,12 +22,12 @@ router.get('/', function(req, res){
 });
 
 // Add Idea Form
-router.get('/add', function(req, res){
+router.get('/add', ensureAuthenticated, function(req, res){
   res.render('ideas/add');
 });
 
 // Edit Idea Form
-router.get('/edit/:id', function(req, res){
+router.get('/edit/:id', ensureAuthenticated, function(req, res){
   Idea.findOne({
     _id: req.params.id
   })
@@ -38,7 +39,7 @@ router.get('/edit/:id', function(req, res){
 });
 
 // Process form
-router.post('/', function(req, res) {
+router.post('/', ensureAuthenticated, function(req, res) {
   var errors = [];
   if(!req.body.title){
     errors.push({text: 'Please add a title'});
@@ -56,7 +57,8 @@ router.post('/', function(req, res) {
   } else {
     var newUser = {
       title: req.body.title,
-      details: req.body.details
+      details: req.body.details,
+      user: req.user.id
     };
     new Idea(newUser)
       .save()
@@ -68,7 +70,7 @@ router.post('/', function(req, res) {
 });
 
 // Process Edit form
-router.put('/:id', function(req, res){
+router.put('/:id', ensureAuthenticated,  function(req, res){
   Idea.findOne({
     _id: req.params.id
   })
@@ -85,7 +87,7 @@ router.put('/:id', function(req, res){
 });
 
 // Delete idea from DB
-router.delete('/:id', function(req, res){
+router.delete('/:id', ensureAuthenticated, function(req, res){
   Idea.remove({ _id: req.params.id })
   .then(function(){
     req.flash('success_msg', 'Video idea removed');

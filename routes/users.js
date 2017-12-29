@@ -26,7 +26,7 @@ router.post('/login', function(req, res){
     successRedirect: '/ideas',
     failureRedirect: '/users/login',
     failureFlash: true
-  })(req, res); //next
+  })(req, res); // next 
 });
 
 // Register form post, saved in DB
