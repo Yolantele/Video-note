@@ -32,9 +32,14 @@ router.get('/edit/:id', ensureAuthenticated, function(req, res){
     _id: req.params.id
   })
   .then(function(idea){
-    res.render('ideas/edit', {
-      idea: idea
-    });
+    if (idea.user != req.user.id){
+      req.flash('error_msg', 'Not Authorized');
+      res.redirect('ideas/');
+    } else {
+      res.render('ideas/edit', {
+        idea: idea
+      });
+    }
   });
 });
 
