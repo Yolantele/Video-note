@@ -79,7 +79,7 @@ app.use(function(req, res, next){
 
 // Index
 app.get('/', function(req, res){
-  var title = 'Welcome1';
+  var title = 'Video Note';
   res.render('index', {
     title: title
   });
