@@ -17,11 +17,14 @@ var users = require('./routes/users');
 // Passport Config
 require('./config/passport')(passport);
 
+// DB Config
+var db = require('./config/dadatabase');
+
 // Map global promise - get rid of warning
 mongoose.Promise = global.Promise;
 
-// Connect to external mongoDB through Mlab
-mongoose.connect('mongodb://jolanta:jolanta@ds231987.mlab.com:31987/jolantajas', {
+// Connect to mongoose
+mongoose.connect(db.mongoURI, {
   useMongoClient: true
 })
   .then(function(){
@@ -92,7 +95,7 @@ app.use('/ideas', ideas);
 app.use('/users', users);
 
 
-var port = 5000;
+var port = process.env.PORT || 5000;
 app.listen(port, function(){
   console.log(`Server started on post ${port}`);
 });
