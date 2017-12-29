@@ -1,6 +1,12 @@
 var express = require('express');
 var mongoose = require('mongoose');
+var bcrypt = require('bcryptjs');
+var passport = require('passport');
 var router = express.Router();
+
+// Load User models
+require('../models/User');
+var User = mongoose.model('users');
 
 // --- ROUTES : ---
 
@@ -14,7 +20,7 @@ router.get('/register', function(req, res){
   res.render('users/register');
 });
 
-// Register form post
+// Register form post, saved in DB
 router.post('/register', function(req, res){
  var errors = [];
 
@@ -33,7 +39,35 @@ router.post('/register', function(req, res){
       password2: req.body.password2
     });
   } else {
-    res.send('passed');
+    User.findOne( {email: req.body.email} )
+      .then(function(user){
+        if(user){
+          req.flash('error_msg', 'Email already registered');
+          res.redirect('/users/register');
+        } else {
+          var newUser = new User({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+          });
+
+          bcrypt.genSalt(10, function(err, salt){
+            bcrypt.hash(newUser.password, salt, function(err, hash){
+              if(err) throw err;
+              newUser.password = hash;
+              newUser.save()
+              .then(function(user){
+                req.flash('success_msg', 'you are now registered and can log in');
+                res.redirect('/users/login');
+              })
+              .catch(function(err){
+                console.log(err);
+                return;
+              });
+            });
+          });
+        }
+      });
   }
 });
 
