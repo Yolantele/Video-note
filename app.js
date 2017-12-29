@@ -6,12 +6,16 @@ var flash = require('connect-flash');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var passport = require('passport');
 
 var app = express();
 
 // Load routes
 var ideas = require('./routes/ideas');
 var users = require('./routes/users');
+
+// Passport Config
+require('./config/passport')(passport);
 
 // Map global promise - get rid of warning
 mongoose.Promise = global.Promise;
